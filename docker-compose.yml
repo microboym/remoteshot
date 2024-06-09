@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - server
+      - gallery
+
+  server:
+    build: ./server
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./data/Pictures:/Pictures
+    environment:
+      - IMAGE_DIR=/Pictures
+
+  gallery:
+    image: xemle/home-gallery
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data
+    user: "${CURRENT_USER}"
+    entrypoint: [ 'node', '/app/gallery.js' ]
+    command: [ 'run', 'server' ]

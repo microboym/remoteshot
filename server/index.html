@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Screenshot Controller</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<div class="container mx-auto p-4 space-y-10">
+    <h1 class="text-2xl font-bold text-center m-10">远程截图控制器</h1>
+
+    <div class="bg-info h-full mx-auto">
+        <div class="flex items-center p-4 bg-white rounded-lg py-10">
+            <div class="flex items-center w-full h-full py-auto text-center justify-center">
+                <div id="placeholder" class="text-gray-700 font-semibold">点击下方按钮发起截图</div>
+                <div id="screenshots" class="m-2 p-2 justify-center"></div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="container mx-auto px-4 text-center">
+        <button id="screenshotButton"
+                class="bg-green-200 hover:bg-green-300 text-gray-700 font-semibold hover:text-gray-500 py-2 px-4 border border-gray-300 hover:border-gray-400 rounded-lg">
+            发起远程截图
+        </button>
+        <button id="viewGalleryButton"
+                class="bg-yellow-200 hover:bg-yellow-300 text-gray-700 font-semibold hover:text-gray-500 py-2 px-4 border border-gray-300 hover:border-gray-400 rounded-lg"
+                onclick="window.location.href='/gallery'">查看图库
+        </button>
+    </div>
+</div>
+
+<script>
+    const screenshotButton = document.getElementById('screenshotButton');
+    const viewGalleryButton = document.getElementById('viewGalleryButton');
+    const screenshots = document.getElementById('screenshots');
+    const placeholder = document.getElementById('placeholder');
+    let empty = true;
+
+    screenshotButton.addEventListener('click', async () => {
+        screenshotButton.disabled = true;
+        viewGalleryButton.disabled = true;
+
+        const response = await fetch('/fetch', {method: 'GET'});
+        screenshotButton.disabled = false;
+        viewGalleryButton.disabled = false;
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data['status'] !== 'success') {
+                alert('截图失败!');
+                return;
+            }
+            if (data['filenames'].length === 0) {
+                alert('设备未连接!');
+                return;
+            }
+
+            if (empty) {
+                console.log(placeholder)
+                // Hide the placeholder
+                placeholder.style.display = 'none';
+                empty = false;
+            }
+
+            data['filenames'].forEach((screenshot, index) => {
+                const img = document.createElement('img');
+                img.src = "images/" + screenshot;
+                img.className = 'object-scale-down rounded-lg border border-gray-300';
+                screenshots.appendChild(img);
+            });
+        }
+
+    });
+</script>
+</body>
+</html>
