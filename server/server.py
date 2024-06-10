@@ -9,6 +9,7 @@ import tornado.web
 import tornado.websocket
 
 root = os.getenv("IMAGE_DIR", "./Pictures")
+os.makedirs(root, exist_ok=True)
 
 
 class MainHandler(tornado.web.RequestHandler):

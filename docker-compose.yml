@@ -26,6 +26,9 @@ services:
       - "3000:3000"
     volumes:
       - ./data:/data
+    environment:
+      # Use polling for safety of possible network mounts. Try 0 to use inotify via fs.watch
+      - GALLERY_WATCH_POLL_INTERVAL=30
     user: "${CURRENT_USER}"
     entrypoint: [ 'node', '/app/gallery.js' ]
     command: [ 'run', 'server' ]
